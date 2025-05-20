@@ -11,14 +11,13 @@ from datetime import datetime
 import psutil
 import sys
 
-DIR = [  # FCT_dir,                   local_dir,                         backup_dir
-    [r'C:\Users\xn.yang\Desktop\XD\FCT', r'C:\Users\xn.yang\Desktop\XD\Local', r'C:\Users\xn.yang\Desktop\XD\Backup'],
-    [r'C:\Users\xn.yang\Desktop\XHI\FCT', r'C:\Users\xn.yang\Desktop\XHI\Local', r'C:\Users\xn.yang\Desktop\XHI\Backup']
+DIR = [  # New_dir,                   local_dir,                         backup_dir
+    [r'New file dir', r'Local file dir', r'Backup file dir'],
 ]
 
 Log_dir = [
-    r'C:\Users\xn.yang\Desktop\XD\log.txt',
-    r'C:\Users\xn.yang\Desktop\XHI\log.txt'
+    r'Log file dir',
+
 ]
 
 
@@ -27,83 +26,83 @@ def clear_folder(folder_path):
     os.makedirs(folder_path)
 
 
-def check(FCT_dir, local_dir, backup_dir):  # Check whether local dir file match with FCT dir file
+def check(New_dir, local_dir, backup_dir):  # Check whether local dir file match with New dir file
 
-    # Get latest FCT filename
-    global Local_FCT_filename
-    for file_root, dirs, files in os.walk(FCT_dir):
+    # Get latest file filename
+    global Local_file_filename
+    for file_root, dirs, files in os.walk(New_dir):
         for file in files:
             if file[-3:] == "zip":
                 target_file = file
-                Latest_FCT_filename = file[:-4]
-                print("Latest sharepoint FCT config:", Latest_FCT_filename)
+                Latest_file_filename = file[:-4]
+                print("Latest File:", Latest_file_filename)
 
-    # Local directory for FCT software
+    # Local directory for file software
     if not os.path.exists(local_dir):
         os.makedirs(local_dir)
 
-    # Get local FCT filename
+    # Get local file filename
     for file_root, dirs, files in os.walk(
-            local_dir):  # Compare whether the FCT file same with the seed file in sharepoint
+            local_dir):  # Compare whether the  file same with the seed file in sharepoint
         for file in files:
             if file == []:
                 print("file empty")
 
             if file[-3:] == "zip":
                 local_file = file
-                Local_FCT_filename = file[:-4]
-                print("Local FCT config:", Local_FCT_filename)
+                Local_file_filename = file[:-4]
+                print("Local file:", Local_file_filename)
 
     if not os.path.exists(backup_dir):
         os.makedirs(backup_dir)
 
-    if Local_FCT_filename == Latest_FCT_filename:
-        print("FCT updated")
+    if Local_file_filename == Latest_file_filename:
+        print("File updated")
 
-        Label(root, text='FCT已更新' + '\n' + Latest_FCT_filename, background='#00FF00', font=1).place(x=20, y=30)
+        Label(root, text='File 已更新' + '\n' + Latest_file_filename, background='#00FF00', font=1).place(x=20, y=30)
         root.attributes('-alpha', 0.3)
 
     else:
-        print("FCT not updated")
-        Label(root, text='FCT未更新' + '\n' + Local_FCT_filename, background='#FF0000', font=1).place(x=20, y=30)
+        print("File not updated")
+        Label(root, text='File 未更新' + '\n' + Local_file_filename, background='#FF0000', font=1).place(x=20, y=30)
         root.attributes('-alpha', 0.3)
 
-        local_FCT_file = local_dir + '\\' + local_file
+        local_file_file = local_dir + '\\' + local_file
         check_file_in_backup_dir = backup_dir + '\\' + local_file
 
         if not os.path.exists(check_file_in_backup_dir):
-            shutil.move(local_FCT_file, backup_dir)  # move old file to backup directory
-            print("Old FCT moved to backup folder")
+            shutil.move(local_file_file, backup_dir)  # move old file to backup directory
+            print("Old file moved to backup folder")
         else:
-            print("Local FCT file exist in backup folder already")
+            print("Local file file exist in backup folder already")
 
-        clear_folder(local_dir)  # Clear existing FCT files
+        clear_folder(local_dir)  # Clear existing File files
 
-        target_FCT_file = FCT_dir + '\\' + target_file
-        shutil.copy(target_FCT_file, local_dir)  # move new config to dir
-        print("Latest FCT copied to local folder")
+        target_file_file = New_dir + '\\' + target_file
+        shutil.copy(target_file_file, local_dir)  # move new config to dir
+        print("Latest file copied to local folder")
 
-        shutil.unpack_archive(target_FCT_file, local_dir)  # Auto unpack the ip file
-        print("FCT updated. Zip file unpacked successfully")
-        Label(root, text='FCT已更新' + '\n' + Latest_FCT_filename, background='#00FF00', font=1).place(x=20, y=30)
+        shutil.unpack_archive(target_file_file, local_dir)  # Auto unpack the ip file
+        print("File updated. Zip file unpacked successfully")
+        Label(root, text='File updated' + '\n' + Latest_file_filename, background='#00FF00', font=1).place(x=20, y=30)
         root.attributes('-alpha', 0.3)
 
-        write_logs(Log_dir, Local_FCT_filename, Latest_FCT_filename)
+        write_logs(Log_dir, Local_file_filename, Latest_file_filename)
 
 
 def path():
-    if check_process_status('RuntimeBroker.exe'):  # FCT software name input
+    if check_process_status('RuntimeBroker.exe'):  #  software name input
         return
 
-    global FCT_dir, local_dir, backup_dir
-    FCT_dir = None
+    global New_dir, local_dir, backup_dir
+    New_dir = None
     local_dir = None
     backup_dir = None
     for A, B, C in DIR:
-        FCT_dir = A
+        New_dir = A
         local_dir = B
-        backup_dir = C  # Backup directory for FCT
-        check(FCT_dir, local_dir, backup_dir)
+        backup_dir = C
+        check(New_dir, local_dir, backup_dir)
 
 
 def write_logs(Log_dir, filename_Last, filename_new):
@@ -160,7 +159,7 @@ def check_process_status(target_name, case_sensitive=False):
 
 
 if __name__ == "__main__":
-    global FCT_dir, local_dir, backup_dir
+    global New_dir, local_dir, backup_dir
     # 創件文件路徑對話框
     root = Tk()
 
@@ -169,7 +168,7 @@ if __name__ == "__main__":
     ft2 = tkFont.Font(size=15)
 
     # 對話框格式
-    root.title('FCT_detection_v1.0')
+    root.title('File_detection_v1.0')
     root.attributes('-alpha', 0.70)  # 背景半透明
     root.attributes('-topmost', True)  # 程序永久置頂
     root.config(bg='#C0C0C0')
